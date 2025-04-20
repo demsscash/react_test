@@ -115,8 +115,17 @@ public class NonAdminAccessTest {
         loginPage.open();
         loginPage.login(USER_EMAIL, USER_PASSWORD);
 
+        // Attendre un moment pour s'assurer que la redirection est complète
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // Vérifier que l'utilisateur est redirigé vers la page d'accueil (racine)
         String currentUrl = driver.getCurrentUrl();
+        System.out.println("URL après connexion utilisateur standard: " + currentUrl);
+
         assertTrue("L'utilisateur devrait être redirigé vers la racine après connexion",
                 currentUrl.equals(BASE_URL + "/") || currentUrl.equals(BASE_URL));
     }
@@ -129,11 +138,34 @@ public class NonAdminAccessTest {
 
         // 2. Vérifier que l'utilisateur est redirigé vers la page d'accueil
         String homeUrl = driver.getCurrentUrl();
+        System.out.println("URL après connexion: " + homeUrl);
+
         assertTrue("L'utilisateur devrait être redirigé vers la racine après connexion",
                 homeUrl.equals(BASE_URL + "/") || homeUrl.equals(BASE_URL));
 
+        // Attendre un moment pour s'assurer que la connexion est complète
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // 3. Essayer d'accéder à la page admin
         adminPage.goToAdminPage();
+
+        // Ajouter un délai pour attendre toute redirection potentielle
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Capturer l'écran pour vérifier ce que voit l'utilisateur
+        captureScreenshot("non_admin_access_attempt");
+
+        // Obtenir l'URL actuelle pour débogage
+        String currentUrl = driver.getCurrentUrl();
+        System.out.println("URL après tentative d'accès admin: " + currentUrl);
 
         // 4. Vérifier que l'utilisateur est redirigé vers la page unauthorized ou ne peut pas accéder à la page admin
         boolean isUnauthorized = adminPage.isUserRedirectedToUnauthorized() ||
@@ -150,23 +182,35 @@ public class NonAdminAccessTest {
         loginPage.login(USER_EMAIL, USER_PASSWORD);
 
         // Attendre la redirection vers la page d'accueil
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         String homeUrl = driver.getCurrentUrl();
+        System.out.println("URL après connexion: " + homeUrl);
         assertTrue("L'utilisateur devrait être redirigé vers la racine après connexion",
                 homeUrl.equals(BASE_URL + "/") || homeUrl.equals(BASE_URL));
 
         // Vérifier que l'utilisateur ne peut pas accéder aux pages admin
+        System.out.println("Vérification de l'accès à la page médecins...");
         assertFalse("L'utilisateur standard ne devrait pas pouvoir accéder à la page médecins",
                 adminPage.canAccessMedecinsPage());
 
+        System.out.println("Vérification de l'accès à la page patients...");
         assertFalse("L'utilisateur standard ne devrait pas pouvoir accéder à la page patients",
                 adminPage.canAccessPatientsPage());
 
+        System.out.println("Vérification de l'accès à la page secrétaires...");
         assertFalse("L'utilisateur standard ne devrait pas pouvoir accéder à la page secrétaires",
                 adminPage.canAccessSecretairesPage());
 
+        System.out.println("Vérification de l'accès à la page cliniques...");
         assertFalse("L'utilisateur standard ne devrait pas pouvoir accéder à la page cliniques",
                 adminPage.canAccessCliniquesPage());
 
+        System.out.println("Vérification de l'accès à la page kiosks...");
         assertFalse("L'utilisateur standard ne devrait pas pouvoir accéder à la page kiosks",
                 adminPage.canAccessKiosksPage());
     }
@@ -178,20 +222,53 @@ public class NonAdminAccessTest {
         loginPage.login(USER_EMAIL, USER_PASSWORD);
 
         // Attendre la redirection vers la page d'accueil
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         String homeUrl = driver.getCurrentUrl();
+        System.out.println("URL après connexion: " + homeUrl);
         assertTrue("L'utilisateur devrait être redirigé vers la racine après connexion",
                 homeUrl.equals(BASE_URL + "/") || homeUrl.equals(BASE_URL));
 
         // Vérifier l'accès aux pages autorisées pour les utilisateurs standards
         // Vérifier l'accès à la page des factures
         driver.get(BASE_URL + "/factures");
+
+        // Attendre que la page se charge
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         String currentUrl = driver.getCurrentUrl();
+        System.out.println("URL après navigation vers factures: " + currentUrl);
+
+        // Capturer une capture d'écran pour voir ce que l'utilisateur voit
+        captureScreenshot("regular_user_factures_page");
+
         assertTrue("L'utilisateur standard devrait pouvoir accéder à la page des factures",
                 currentUrl.contains("/factures"));
 
         // Vérifier l'accès à la page des ordonnances
         driver.get(BASE_URL + "/ordonnances");
+
+        // Attendre que la page se charge
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         currentUrl = driver.getCurrentUrl();
+        System.out.println("URL après navigation vers ordonnances: " + currentUrl);
+
+        // Capturer une capture d'écran pour voir ce que l'utilisateur voit
+        captureScreenshot("regular_user_ordonnances_page");
+
         assertTrue("L'utilisateur standard devrait pouvoir accéder à la page des ordonnances",
                 currentUrl.contains("/ordonnances"));
     }
